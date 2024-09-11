@@ -1,62 +1,22 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# <em style="text-align:center">Copyright Iván Pinar Domínguez</em>
-
-# #  ChatMessageHistory
-
-# In[ ]:
-
-
+from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain.schema import SystemMessage, HumanMessage
-f = open('../OpenAI_key.txt')
-api_key = f.read()
-chat = ChatOpenAI(openai_api_key=api_key)
+from langchain.schema import HumanMessage
+from langchain_community.chat_message_histories import ChatMessageHistory
 
-
-# In[ ]:
-
-
-#Definimos el objeto de histórico de mensajes
-from langchain.memory import ChatMessageHistory
+load_dotenv()
+chat = ChatOpenAI()
 
 history = ChatMessageHistory()
-
-
-# In[ ]:
-
-
 consulta = "Hola, ¿cómo estás? Necesito ayudar para reconfigurar el router"
-
-
-# In[ ]:
-
-
-#Vamos guardando en el objeto "history" los mensajes de usuario y los mensajes AI que queramos
 history.add_user_message(consulta)
-
-
-# In[ ]:
-
-
 resultado = chat.invoke([HumanMessage(content=consulta)])
-
-
-# In[ ]:
-
-
 history.add_ai_message(resultado.content)
 
+print('\n History:')
+print(history)
 
-# In[ ]:
-
-
-history
-
-
-# In[ ]:
-
-
-history.messages
-
+print('\n History messages:')
+print(history.messages)
