@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+    mysql:
+        container_name: langchain_db
+        image: mysql:latest
+        restart: always
+        command: --default-authentication-plugin=mysql_native_password
+        volumes:
+            - langchaindb:/var/lib/mysql
+            - ./unit_6_agents/db:/opt/db
+        ports:
+            - ${DATABASE_PORT:-3304}:3306
+        environment:
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+            MYSQL_DATABASE: ${DATABASE_DATABASE}
+            TZ: ${DB_TZ:-UTC}
+
+volumes:
+    langchaindb:
