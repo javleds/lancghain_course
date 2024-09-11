@@ -1,58 +1,29 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# <em style="text-align:center">Copyright Iván Pinar Domínguez</em>
-
-# ## Importar librerías iniciales e instancia de modelo de chat
-
-# In[ ]:
-
-
+# pip install numexpr
+from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain.prompts import PromptTemplate, SystemMessagePromptTemplate,ChatPromptTemplate, HumanMessagePromptTemplate
-f = open('../OpenAI_key.txt')
-api_key = f.read()
-llm = ChatOpenAI(openai_api_key=api_key,temperature=0) #Recomendable temperatura a 0 para que el LLM no sea muy creativo, vamos a tener muchas herramientas a nuestra disposición y queremos que sea más determinista
+from langchain.prompts import PromptTemplate
+from langchain.agents import (
+    load_tools,
+    initialize_agent,
+    AgentType,
+    create_react_agent,
+    AgentExecutor
+)
 
+load_dotenv()
+llm = ChatOpenAI(temperature=0)
 
-# In[ ]:
+# Lista de herramientas disponibles: https://python.langchain.com/v0.1/docs/integrations/tools/
+tools = load_tools(["llm-math"], llm=llm)
 
-
-from langchain.agents import load_tools,initialize_agent,AgentType,create_react_agent,AgentExecutor
-
-
-# ## Definimos las herramientas a las que tendrá acceso el agente (aparte del propio motor LLM)
-
-# In[ ]:
-
-
-tools = load_tools(["llm-math",],llm=llm) #Lista de herramientas disponibles: https://python.langchain.com/v0.1/docs/integrations/tools/
-
-
-# ## Inicializamos y ejecutamos el Agente
-
-# In[ ]:
-
-
-#dir(AgentType) #Vemos los diferentes tipos de agente a usar
-
-
-# In[ ]:
-
-
-agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,verbose=True,handle_parsing_errors=True) #Usamos el Zero Shot porque no estamos dando ningún ejemplo, solo pidiendo al agente hacer una tarea sin ejemplos previos
-
-
-# In[ ]:
-
-
-agent.run("Dime cuánto es 1598 multiplicado por 1983 y después sumas 1000")
-
-
-# ## Alternativa agente con create_react_agent (indicaciones explícitas)
-
-# In[ ]:
-
+# Usamos el Zero Shot porque no estamos dando ningún ejemplo
+agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=False, handle_parsing_errors=True)
+response1 = agent.run("Dime cuánto es 1598 multiplicado por 1983 y después sumas 1000")
+print('\nPrimera respuesta:')
+print(response1)
 
 template = '''Responde lo mejor que puedas usando tu conocimiento como LLM o bien las siguientes herramientas:
 {tools}
@@ -69,24 +40,8 @@ Respuesta final: la respuesta final a la pregunta de entrada original
 Pregunta: {input}
 Pensamiento:{agent_scratchpad}'''
 
-#agent_scratchpad: El agente no llama a una herramienta solo una vez para obtener la respuesta deseada, sino que tiene una estructura que llama a las herramientas repetidamente hasta obtener la respuesta deseada. Cada vez que llama a una herramienta, en este campo se almacena cómo fue la llamada anterior, información sobre la llamada anterior y el resultado.
-
-
-# In[ ]:
-
-
 prompt = PromptTemplate.from_template(template)
-
-
-# In[ ]:
-
-
-agente = create_react_agent(llm,tools,prompt)
-
-
-# In[ ]:
-
-
+agente = create_react_agent(llm, tools, prompt)
 agent_executor = AgentExecutor(
     agent=agente,
     tools=tools,
@@ -95,16 +50,6 @@ agent_executor = AgentExecutor(
     handle_parsing_errors=True
 )
 
-
-# In[ ]:
-
-
 respuesta = agent_executor.invoke({"input": "Dime cuánto es 1598 multiplicado por 1983"})
+print('\nSegunda respuesta con tools respuesta:')
 print(respuesta)
-
-
-# In[ ]:
-
-
-
-
