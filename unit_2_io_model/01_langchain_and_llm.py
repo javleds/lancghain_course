@@ -1,75 +1,26 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# <em style="text-align:center">Copyright Iván Pinar Domínguez</em>
-
-# ## Importar librerías y clave OpenAI
-
-# In[5]:
-
-
 from dotenv import load_dotenv
-load_dotenv()
-
-
-# In[2]:
-
-
 from langchain_openai import ChatOpenAI
 from langchain.schema import SystemMessage, HumanMessage
-#Alternativa para importar tipos de mensajes: from langchain_core.messages import HumanMessage, SystemMessage
 
+# Alternativa para importar tipos de mensajes:
+# from langchain_core.messages import HumanMessage, SystemMessage
 
-# In[6]:
-
-
+load_dotenv()
 chat = ChatOpenAI()
+resultado_simple = chat.invoke([HumanMessage(content="¿Puedes decirme dónde se encuentra Cáceres?")])
+print(resultado_simple.content)
 
+# Especificamos el SystemMessage para definir la personalidad que debe tomar el sistema
+resultado_personalizado = chat.invoke(
+    [SystemMessage(content='Eres un historiador que conoce los detalles de todas las ciudades del mundo'),
+     HumanMessage(content='¿Puedes decirme dónde se encuentra Cáceres')])
 
-# ## Obtener 1 resultado invocando al chat de OpenAI
+print(resultado_personalizado.content)
 
-# In[7]:
-
-
-resultado = chat.invoke([HumanMessage(content="¿Puedes decirme dónde se encuentra Cáceres?")])
-
-
-# In[8]:
-
-
-resultado
-
-
-# In[9]:
-
-
-resultado.content
-
-
-# In[ ]:
-
-
-#Especificamos el SystemMessage para definir la personalidad que debe tomar el sistema
-
-
-# In[ ]:
-
-
-resultado = chat.invoke([SystemMessage(content='Eres un historiador que conoce los detalles de todas las ciudades del mundo'),
-               HumanMessage(content='¿Puedes decirme dónde se encuentra Cáceres')])
-
-
-# In[ ]:
-
-
-resultado.content
-
-
-# ## Obtener varios resultados invocando al chat de OpenAI con "generate"
-
-# In[ ]:
-
-
+# Obtener varios resultados invocando al chat de OpenAI con "generate"
 resultado = chat.generate(
     [
         [SystemMessage(content='Eres un historiador que conoce los detalles de todas las ciudades del mundo'),
@@ -79,17 +30,8 @@ resultado = chat.generate(
     ]
 )
 
-
-# In[ ]:
-
-
-#Resultado con primer sistema
+# Resultado como historiador
 print(resultado.generations[0][0].text)
 
-
-# In[ ]:
-
-
-#Resultado con segundo sistema
+# Resultado como joven rudo
 print(resultado.generations[1][0].text)
-
