@@ -5,3 +5,4 @@ venv/
 ejemplosk_embedding_db
 ejemplos_embedding_db
 ejemplo_wiki_bd
+*.pkl
